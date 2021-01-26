@@ -1,6 +1,7 @@
 #Author: Keeton Martin
 import numpy as np
 import pandas as pd
+import random
 
 class Board():
 	"""docstring for Board"""
@@ -26,6 +27,20 @@ class Board():
 		self.insertAtIndex(howManyFromTop, howManyFromLeft, "O")
 		# print(self)
 		self.checkWinConditions("O")
+
+	def emptySpots(self):
+		returnableSpots = []
+
+		rowIndex = 0
+		for row in self.array:
+			colIndex = 0
+			for spot in row:
+				if not (spot == "X" or spot == "O"):
+					returnableSpots.append((rowIndex, colIndex))
+				colIndex+=1
+			rowIndex+=1
+
+		return returnableSpots
 
 	def __str__(self):
 		return str(self.array)
@@ -66,12 +81,17 @@ class Board():
 
 	def chooseBestXSpot(self):
 		temp = self.playerCouldWin("X")
+		temp2 = self.playerCouldWin("O")
 		if temp:
 			print("Winning!")
 			return temp
+		elif temp2:
+			print("Almost missed it!")
+			return temp2
 		else:
-			return 2, 1
-
+			spotOptions = self.emptySpots()
+			selectionTuple = random.choice(spotOptions)
+			return selectionTuple[0],selectionTuple[1]
 
 	def playerCouldWin(self, letter):
 		rowIndex = 0
@@ -90,6 +110,9 @@ class Board():
 				targetRow = self.findWinningSpot(letter, rowT)
 				return targetRow, colIndex
 			colIndex+=1
+
+		# diags = [[self.array[0][0], self.array[1][1], self.array[2][2]]]
+		# for diag in 
 
 		# Haven't checked diagonals yet
 		return None
@@ -141,6 +164,10 @@ def main():
 
 		print(pd.DataFrame(np.matrix(ourBoard.array)))
 		ourBoard.checkWinConditions("X")
+
+		if not ourBoard.emptySpots():
+			print("Looks like it's a draw!")
+			exit()
 
 		print("What's your move?")
 		coords = input("Input comma seprated coords: ")
